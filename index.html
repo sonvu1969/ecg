@@ -4,27 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
     <title>3D Ultrasound - Siêu âm 3D</title>
-    <link rel="icon" type="image/png" href="logo.png">
-    <link rel="apple-touch-icon" href="logo.png">
-    <link rel="manifest" href="manifest.json">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
             background: #0a0a0a;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            /* Sửa chiều cao linh hoạt cho cả PC và Mobile */
-            height: 100dvh;
+            height: 100dvh; /* Sử dụng dvh để fix trên di động */
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
-        
         .header {
             background: linear-gradient(135deg, #0a1a1f 0%, #0d2a2f 100%);
             padding: 12px 16px;
@@ -32,106 +21,35 @@
             border-bottom: 2px solid #ffaacc;
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
-        
-        .baby-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: #ffccee;
-            letter-spacing: 1px;
-        }
-        
-        .baby-week {
-            font-size: 14px;
-            color: #ffaacc;
-            margin-top: 4px;
-        }
-        
-        .baby-week span {
-            color: #ffdd99;
-            font-weight: bold;
-            font-size: 18px;
-        }
-        
-        .canvas-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #000;
-            padding: 8px;
-            min-height: 0;
-        }
-        
-        canvas {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 12px;
-            cursor: grab;
-            touch-action: none;
-        }
-        
+        .baby-name { font-size: 18px; font-weight: bold; color: #ffccee; letter-spacing: 1px; }
+        .baby-week { font-size: 14px; color: #ffaacc; margin-top: 4px; }
+        .baby-week span { color: #ffdd99; font-weight: bold; font-size: 18px; }
+        .canvas-container { flex: 1; display: flex; justify-content: center; align-items: center; background: #000; padding: 8px; min-height: 0; }
+        canvas { width: 100%; height: 100%; object-fit: contain; border-radius: 12px; cursor: grab; touch-action: none; }
         .bottom-bar {
             background: #0a1a1f;
             padding: 12px 16px;
             border-top: 1px solid #2a4a5f;
-            /* Fix khoảng cách an toàn cho iPhone */
             padding-bottom: calc(12px + env(safe-area-inset-bottom));
         }
-        
-        .color-row {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            margin-bottom: 4px;
-        }
-        
+        .color-row { display: flex; gap: 12px; justify-content: center; margin-bottom: 4px; }
         .color-btn {
-            background: #0a2a2f;
-            border: 1px solid #2a6a7f;
-            color: #6aabbf;
-            width: 50px;
-            height: 50px;
-            border-radius: 25px;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.1s ease;
-            touch-action: manipulation;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: #0a2a2f; border: 1px solid #2a6a7f; color: #6aabbf;
+            width: 50px; height: 50px; border-radius: 25px; font-size: 20px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
-        
-        .color-btn:active {
-            transform: scale(0.92);
-            background: #1a4a5f;
-        }
-        
-        .btn-active {
-            background: #1a4a5f;
-            border-color: #4a9abf;
-            color: #c0e8ff;
-            box-shadow: 0 0 8px #4a9abf;
-        }
-        
-        .hint {
-            text-align: center;
-            font-size: 11px;
-            color: #3a6a7f;
-            margin-top: 6px;
-        }
+        .btn-active { background: #1a4a5f; border-color: #4a9abf; color: #c0e8ff; box-shadow: 0 0 8px #4a9abf; }
+        .hint { text-align: center; font-size: 11px; color: #3a6a7f; margin-top: 6px; }
     </style>
 </head>
 <body>
-    <div class="header" id="headerInfo">
+    <div class="header">
         <div class="baby-name" id="babyName">🌸 Bé yêu của mẹ</div>
-        <div class="baby-week" id="babyWeek">💖 <span id="weekNumber">--</span> tuần thai kỳ</div>
+        <div class="baby-week">💖 <span id="weekNumber">--</span> tuần thai kỳ</div>
     </div>
-    
     <div class="canvas-container">
         <canvas id="canvas_gl" width="512" height="512"></canvas>
     </div>
-    
     <div class="bottom-bar">
         <div class="color-row">
             <button class="color-btn" id="btnSiemens" onclick="setLUT('siemens')">🔵</button>
@@ -145,12 +63,10 @@
     </div>
 
 <script>
-// ---------- KHÔI PHỤC TOÀN BỘ LOGIC GỐC CỦA ANH VŨ ----------
+// ---------- LOGIC GỐC PHỤC HỒI HOÀN TOÀN ----------
 const W = 256, H = 256, D = 32;
 const volSize = W * H * D;
-const DB_NAME = 'Ultrasound3D';
-const DB_VERSION = 1;
-const STORE_NAME = 'volumeData';
+const DB_NAME = 'Ultrasound3D', DB_VERSION = 1, STORE_NAME = 'volumeData';
 
 let currentVolume = new Uint8Array(volSize);
 let gl, program, volTexture, mapTexture;
@@ -162,111 +78,53 @@ let currentRotX = 25, currentRotY = 40, currentRotZ = 0;
 let currentWeek = 24, currentPatientName = "Bé yêu";
 let cutX = 0, cutY = 0, cutZ = 0;
 let currentQuat = { x: 0, y: 0, z: 0, w: 1 }, targetQuat = { x: 0, y: 0, z: 0, w: 1 };
-let animFrameQuat = null, rotMatrix = [1,0,0, 0,1,0, 0,0,1];
-let minTex = [0,0,0], maxTex = [1,1,1], lutData = new Uint8Array(1024);
-let initialDistance = 0, initialZoom = 0, isDragging = false;
-let lastTouchX = 0, lastTouchY = 0;
+let rotMatrix = [1,0,0, 0,1,0, 0,0,1], lutData = new Uint8Array(1024);
+let initialDistance = 0, initialZoom = 0, isDragging = false, lastTouchX = 0, lastTouchY = 0;
 let mouseDragging = false, lastMouseX = 0, lastMouseY = 0;
 
+// QUAN TRỌNG: Hàm tính toán Spread và ZScale để hình không bị xẹp
 function updateSpreadAndZScale() {
-    if (currentMode > 0.5) { currentSpread = 10.0 + 130.0 * currentDegRaw / 100.0; currentZScale = 1.0; }
-    else { currentZScale = 1.0 + 7.0 * currentDegRaw / 100.0; currentSpread = 60.0; }
-    if(gl) {
+    if (currentMode > 0.5) {
+        currentSpread = 10.0 + 130.0 * currentDegRaw / 100.0;
+        currentZScale = 1.0;
+    } else {
+        currentZScale = 1.0 + 7.0 * currentDegRaw / 100.0;
+        currentSpread = 60.0;
+    }
+    if(gl && program) {
         gl.uniform1f(gl.getUniformLocation(program, "uSpread"), currentSpread);
         gl.uniform1f(gl.getUniformLocation(program, "uZScale"), currentZScale);
     }
 }
-function updateRotationFromAngles() { targetQuat = eulerToQuat(currentRotX, currentRotY, currentRotZ); currentQuat = { ...targetQuat }; updateRotationMatrix(); }
-function updateHeaderInfo() { document.getElementById('babyName').innerHTML = `🌸 Bé yêu của ${currentPatientName}`; document.getElementById('weekNumber').innerHTML = currentWeek; }
-function updateCut() {
-    minTex = [cutX / W, cutY / H, cutZ / D];
-    maxTex = [(W - cutX) / W, (H - cutY) / H, (D - cutZ) / D];
-    if (gl && program) {
-        gl.uniform3fv(gl.getUniformLocation(program, "uMinClip"), minTex);
-        gl.uniform3fv(gl.getUniformLocation(program, "uMaxClip"), maxTex);
-    }
+
+function updateRotationFromAngles() {
+    targetQuat = eulerToQuat(currentRotX, currentRotY, currentRotZ);
+    currentQuat = { ...targetQuat };
+    updateRotationMatrix();
 }
-function openDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-        request.onerror = () => reject(request.error);
-        request.onsuccess = () => resolve(request.result);
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-        };
-    });
+
+function updateHeaderInfo() {
+    document.getElementById('babyName').innerHTML = `🌸 Bé yêu của ${currentPatientName}`;
+    document.getElementById('weekNumber').innerHTML = currentWeek;
 }
-async function saveToIndexedDB() {
-    try {
-        const db = await openDB();
-        const tx = db.transaction(STORE_NAME, 'readwrite');
-        const store = tx.objectStore(STORE_NAME);
-        store.put({
-            id: 'currentVolume', week: currentWeek, alpha: Math.round(currentAlpha * 100),
-            thresh: Math.round(currentThresh * 100), cutX, cutY, cutZ,
-            rotX: Math.round(currentRotX * 255 / 360), rotY: Math.round(currentRotY * 255 / 360),
-            rotZ: Math.round(currentRotZ * 255 / 360), zoom: currentZoomPercent,
-            mode: Math.round(currentMode), degRaw: currentDegRaw, patientName: currentPatientName,
-            volume: Array.from(currentVolume), timestamp: Date.now()
-        });
-    } catch (e) {}
-}
-async function restoreFromIndexedDB() {
-    try {
-        const db = await openDB();
-        const tx = db.transaction(STORE_NAME, 'readonly');
-        const store = tx.objectStore(STORE_NAME);
-        const savedData = await new Promise(r => { const req = store.get('currentVolume'); req.onsuccess = () => r(req.result); });
-        if (savedData && savedData.volume) {
-            currentVolume.set(savedData.volume); uploadVolume();
-            if (savedData.week !== undefined) currentWeek = savedData.week;
-            if (savedData.patientName !== undefined) currentPatientName = savedData.patientName;
-            if (savedData.alpha !== undefined) currentAlpha = savedData.alpha / 100.0;
-            if (savedData.thresh !== undefined) currentThresh = savedData.thresh / 100.0;
-            if (savedData.zoom !== undefined) { currentZoomPercent = savedData.zoom; currentZoom = 1.0 + 3.5 * currentZoomPercent / 100.0; }
-            if (savedData.mode !== undefined) currentMode = savedData.mode;
-            if (savedData.degRaw !== undefined) currentDegRaw = savedData.degRaw;
-            if (savedData.cutX !== undefined) cutX = savedData.cutX;
-            if (savedData.cutY !== undefined) cutY = savedData.cutY;
-            if (savedData.cutZ !== undefined) cutZ = savedData.cutZ;
-            if (savedData.rotX !== undefined) { currentRotX = savedData.rotX * 360 / 255; currentRotY = savedData.rotY * 360 / 255; currentRotZ = savedData.rotZ * 360 / 255; }
-            if(gl) {
-                gl.uniform1f(gl.getUniformLocation(program, "uAlphaNorm"), currentAlpha);
-                gl.uniform1f(gl.getUniformLocation(program, "uThreshNorm"), currentThresh);
-                gl.uniform1f(gl.getUniformLocation(program, "uZoomVal"), currentZoom);
-                gl.uniform1f(gl.getUniformLocation(program, "uMode"), currentMode);
-            }
-            updateSpreadAndZScale(); updateCut(); updateRotationFromAngles(); updateHeaderInfo();
-            return true;
-        }
-    } catch (e) {}
-    return false;
-}
+
 function initGL() {
     const canvas = document.getElementById('canvas_gl');
     gl = canvas.getContext('webgl2', { alpha: false, antialias: true, preserveDrawingBuffer: true });
     if (!gl) return false;
-    const createShader = (type, src) => {
-        let s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
-        return s;
-    };
-    program = gl.createProgram();
-    let vs = createShader(gl.VERTEX_SHADER, `#version 300 es
+
+    const vs = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vs, `#version 300 es
         in vec2 p; out vec2 v; void main() { v = p; gl_Position = vec4(p, 0, 1); }`);
-    let fs = createShader(gl.FRAGMENT_SHADER, `#version 300 es
+    gl.compileShader(vs);
+
+    const fs = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fs, `#version 300 es
         precision highp float; precision highp sampler3D; precision highp sampler2D;
         in vec2 v; out vec4 f; uniform sampler3D uVol; uniform sampler2D uMap;
         uniform mat3 uRot; uniform float uZoomVal, uSpread, uZScale, uStepSize, uMode, uAspect, uAlphaNorm, uThreshNorm, uSmooth;
         uniform vec3 uMinClip, uMaxClip;
         float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
-        float sampleSmooth(vec3 pos, vec3 step) {
-            float v0 = texture(uVol, pos).r;
-            float vx = texture(uVol, pos + vec3(step.x, 0.0, 0.0)).r;
-            float vy = texture(uVol, pos + vec3(0.0, step.y, 0.0)).r;
-            float vz = texture(uVol, pos + vec3(0.0, 0.0, step.z)).r;
-            return mix(v0, v0 + (abs(vx - v0) + abs(vy - v0) + abs(vz - v0)) / 6.0, uSmooth);
-        }
         void main() {
             vec2 uv = v * vec2(uAspect, 1.0);
             vec3 ro = vec3(0.0, 0.0, 5.0 - uZoomVal);
@@ -279,9 +137,11 @@ function initGL() {
                     float angle = atan(rotated.x, rotated.z + 0.5);
                     float radius = length(vec2(rotated.x, rotated.z + 0.5)) - 0.5;
                     sp = vec3(rotated.y + 0.5, radius + 0.5, angle / radians(uSpread) + 0.5);
-                } else { sp = vec3(rotated.x, rotated.y, rotated.z * uZScale) + 0.5; }
+                } else {
+                    sp = vec3(rotated.x, rotated.y, rotated.z * uZScale) + 0.5;
+                }
                 if (all(greaterThanEqual(sp, uMinClip)) && all(lessThanEqual(sp, uMaxClip))) {
-                    float d = sampleSmooth(sp, vec3(0.008));
+                    float d = texture(uVol, sp).r;
                     if (d > uThreshNorm) {
                         vec4 col = texture(uMap, vec2(d, 0.5));
                         float a = col.a * uAlphaNorm;
@@ -293,105 +153,121 @@ function initGL() {
             }
             f = vec4(pow(accum.rgb, vec3(0.9)), 1.0);
         }`);
+    gl.compileShader(fs);
+
+    program = gl.createProgram();
     gl.attachShader(program, vs); gl.attachShader(program, fs); gl.linkProgram(program); gl.useProgram(program);
+
     let buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
-    let pl = gl.getAttribLocation(program, "p"); gl.enableVertexAttribArray(pl); gl.vertexAttribPointer(pl, 2, gl.FLOAT, false, 0, 0);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+    let pL = gl.getAttribLocation(program, "p"); gl.enableVertexAttribArray(pL); gl.vertexAttribPointer(pL, 2, gl.FLOAT, false, 0, 0);
+
     volTexture = gl.createTexture(); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_3D, volTexture);
-    gl.texImage3D(gl.TEXTURE_3D, 0, gl.R8, W, H, D, 0, gl.RED, gl.UNSIGNED_BYTE, null);
+    gl.texImage3D(gl.TEXTURE_3D, 0, gl.R8, W, H, D, 0, gl.RED, gl.UNSIGNED_BYTE, currentVolume);
     gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
     mapTexture = gl.createTexture(); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, mapTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 256, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, lutData);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.uniform1i(gl.getUniformLocation(program, "uVol"), 0); gl.uniform1i(gl.getUniformLocation(program, "uMap"), 1);
+
+    gl.uniform1i(gl.getUniformLocation(program, "uVol"), 0);
+    gl.uniform1i(gl.getUniformLocation(program, "uMap"), 1);
+    gl.uniform3f(gl.getUniformLocation(program, "uMinClip"), 0,0,0);
+    gl.uniform3f(gl.getUniformLocation(program, "uMaxClip"), 1,1,1);
     gl.uniform1f(gl.getUniformLocation(program, "uStepSize"), currentStep);
+    gl.uniform1f(gl.getUniformLocation(program, "uAlphaNorm"), currentAlpha);
+    gl.uniform1f(gl.getUniformLocation(program, "uThreshNorm"), currentThresh);
+    gl.uniform1f(gl.getUniformLocation(program, "uMode"), currentMode);
     gl.uniform1f(gl.getUniformLocation(program, "uAspect"), 1.0);
-    gl.uniform1f(gl.getUniformLocation(program, "uSmooth"), currentSmooth);
-    updateSpreadAndZScale(); updateRotationFromAngles(); updateCut();
+    gl.uniform1f(gl.getUniformLocation(program, "uZoomVal"), currentZoom);
+    
+    updateSpreadAndZScale(); updateRotationFromAngles();
     return true;
 }
-function uploadVolume() { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_3D, volTexture); gl.texSubImage3D(gl.TEXTURE_3D, 0, 0, 0, 0, W, H, D, gl.RED, gl.UNSIGNED_BYTE, currentVolume); }
-function updateLUT() { gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, mapTexture); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 256, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, lutData); }
+
+function uploadVolume() {
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_3D, volTexture);
+    gl.texSubImage3D(gl.TEXTURE_3D, 0, 0,0,0, W,H,D, gl.RED, gl.UNSIGNED_BYTE, currentVolume);
+}
+
 function eulerToQuat(x, y, z) {
     x *= Math.PI/360; y *= Math.PI/360; z *= Math.PI/360;
     let cx = Math.cos(x), sx = Math.sin(x), cy = Math.cos(y), sy = Math.sin(y), cz = Math.cos(z), sz = Math.sin(z);
     return { x: sx*cy*cz + cx*sy*sz, y: cx*sy*cz - sx*cy*sz, z: cx*cy*sz + sx*sy*cz, w: cx*cy*cz - sx*sy*sz };
 }
+
 function updateRotationMatrix() {
     let q = currentQuat, xx = q.x*q.x, yy = q.y*q.y, zz = q.z*q.z, xy = q.x*q.y, xz = q.x*q.z, yz = q.y*q.z, wx = q.w*q.x, wy = q.w*q.y, wz = q.w*q.z;
     rotMatrix = [1-2*(yy+zz), 2*(xy-wz), 2*(xz+wy), 2*(xy+wz), 1-2*(xx+zz), 2*(yz-wx), 2*(xz-wy), 2*(yz+wx), 1-2*(xx+yy)];
     if(gl) gl.uniformMatrix3fv(gl.getUniformLocation(program, "uRot"), false, rotMatrix);
 }
+
 function buildLUT(type) {
     for(let i = 0; i < 256; i++) {
         const t = i / 255; let r, g, b, a;
-        if(type === 'siemens') { if(t < 0.3) r = g = b = a = 0; else if(t < 0.6) { let t2 = (t-0.3)/0.3; r=200*t2; g=100*t2; b=50*t2; a=150*t2; } else { let t2 = (t-0.6)/0.4; r=200+55*t2; g=100+155*t2; b=50+205*t2; a=150+105*t2; } }
-        else if(type === 'hot') { r=255*Math.min(1,t*1.5); g=255*Math.min(1,t*1.2); b=255*t; a=180*t+20; }
+        if(type === 'siemens') {
+            if(t < 0.3) r = g = b = a = 0;
+            else if(t < 0.6) { let t2 = (t-0.3)/0.3; r=200*t2; g=100*t2; b=50*t2; a=150*t2; }
+            else { let t2 = (t-0.6)/0.4; r=200+55*t2; g=100+155*t2; b=50+205*t2; a=150+105*t2; }
+        } else if(type === 'hot') { r=255*Math.min(1,t*1.5); g=255*Math.min(1,t*1.2); b=255*t; a=180*t+20; }
         else if(type === 'cool') { r=80*t; g=180*t; b=255*t; a=180*t; }
         else { r=g=b=255*t; a=200*t; }
         lutData.set([Math.round(r), Math.round(g), Math.round(b), Math.round(a)], i*4);
     }
-    updateLUT();
+    if(gl) { gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, mapTexture); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, 256, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, lutData); }
 }
+
 function setLUT(type) {
     ['btnSiemens', 'btnHot', 'btnCool', 'btnGray'].forEach(id => document.getElementById(id).classList.toggle('btn-active', id === `btn${type.charAt(0).toUpperCase() + type.slice(1)}`));
     buildLUT(type);
 }
+
 function setZoom(p) {
     currentZoomPercent = Math.min(100, Math.max(0, p));
     currentZoom = 1.0 + 3.5 * currentZoomPercent / 100.0;
     if(gl) gl.uniform1f(gl.getUniformLocation(program, "uZoomVal"), currentZoom);
 }
-function captureImage() {
-    const c = document.getElementById('canvas_gl');
-    c.toBlob(b => { let a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `3D_Ultrasound_${Date.now()}.png`; a.click(); }, 'image/png');
-}
-function loadFile() {
-    let input = document.createElement('input'); input.type = 'file';
-    input.onchange = (e) => {
-        let file = e.target.files[0]; if (!file) return;
-        let reader = new FileReader();
-        reader.onload = async (ev) => {
-            currentVolume.set(new Uint8Array(ev.target.result).slice(0, volSize));
-            uploadVolume(); await saveToIndexedDB();
-        };
-        reader.readAsArrayBuffer(file);
-    };
-    input.click();
-}
 
-// ========== EVENT LISTENERS CHO CHUỘT (PC) ==========
-function handleMouseDown(e) {
-    mouseDragging = true; lastMouseX = e.clientX; lastMouseY = e.clientY;
-    document.getElementById('canvas_gl').style.cursor = 'grabbing';
-}
+// ---------- SỰ KIỆN ĐIỀU KHIỂN (PC & MOBILE) ----------
+function handleMouseDown(e) { mouseDragging = true; lastMouseX = e.clientX; lastMouseY = e.clientY; }
 function handleMouseMove(e) {
     if(!mouseDragging) return;
-    let dx = e.clientX - lastMouseX; let dy = e.clientY - lastMouseY;
-    currentRotY = (currentRotY + dx * 0.4) % 360;
-    currentRotX = (currentRotX + dy * 0.4) % 360;
+    currentRotY = (currentRotY + (e.clientX - lastMouseX) * 0.4) % 360;
+    currentRotX = (currentRotX + (e.clientY - lastMouseY) * 0.4) % 360;
     lastMouseX = e.clientX; lastMouseY = e.clientY;
     updateRotationFromAngles();
 }
-function handleMouseUp() {
-    mouseDragging = false;
-    document.getElementById('canvas_gl').style.cursor = 'grab';
-}
+function handleMouseUp() { mouseDragging = false; }
 
-// ========== EVENT LISTENERS CHO CẢM ỨNG (MOBILE) ==========
 function handleTouchStart(e) {
     if(e.touches.length === 1) { isDragging = true; lastTouchX = e.touches[0].clientX; lastTouchY = e.touches[0].clientY; }
     else if(e.touches.length === 2) { initialDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); initialZoom = currentZoomPercent; isDragging = false; }
 }
 function handleTouchMove(e) {
     if(e.touches.length === 1 && isDragging) {
-        let dx = e.touches[0].clientX - lastTouchX, dy = e.touches[0].clientY - lastTouchY;
-        currentRotY = (currentRotY + dx * 0.4) % 360; currentRotX = (currentRotX + dy * 0.4) % 360;
+        currentRotY = (currentRotY + (e.touches[0].clientX - lastTouchX) * 0.4) % 360;
+        currentRotX = (currentRotX + (e.touches[0].clientY - lastTouchY) * 0.4) % 360;
         lastTouchX = e.touches[0].clientX; lastTouchY = e.touches[0].clientY;
         updateRotationFromAngles();
     } else if(e.touches.length === 2) {
         let dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
         setZoom(initialZoom + (dist / initialDistance - 1) * 50);
     }
+}
+
+function captureImage() {
+    const c = document.getElementById('canvas_gl');
+    c.toBlob(b => { let a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `3D_US_${Date.now()}.png`; a.click(); }, 'image/png');
+}
+
+function loadFile() {
+    let i = document.createElement('input'); i.type = 'file';
+    i.onchange = (e) => {
+        let f = e.target.files[0]; if(!f) return;
+        let r = new FileReader(); r.onload = (ev) => { currentVolume.set(new Uint8Array(ev.target.result).slice(0, volSize)); uploadVolume(); };
+        r.readAsArrayBuffer(f);
+    };
+    i.click();
 }
 
 function render() {
@@ -403,14 +279,10 @@ function render() {
 
 async function init() {
     if(!initGL()) return;
-    setLUT('siemens'); render();
-    await restoreFromIndexedDB();
-    
+    setLUT('siemens'); updateHeaderInfo(); render();
     const c = document.getElementById('canvas_gl');
-    // Mobile events
     c.addEventListener('touchstart', handleTouchStart, { passive: false });
     c.addEventListener('touchmove', handleTouchMove, { passive: false });
-    // PC events
     c.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
