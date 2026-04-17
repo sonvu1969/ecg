@@ -1,21 +1,28 @@
 @echo off
-echo Đang kiểm tra Git...
+echo Đang kiểm tra cấu hình Git cho dự án ECG...
 
 :: Khởi tạo nếu thư mục chưa có Git
 if not exist .git (
     git init
-    git remote add origin https://github.com/USERNAME/REPO_NAME.git
+    git branch -M main
+    :: Cấu hình đúng địa chỉ repository của anh
+    git remote add origin https://github.com/sonvu1969/ecg.git
 )
 
-echo Đang chuẩn bị đẩy dữ liệu...
+echo Đang chuẩn bị đẩy dữ liệu mới...
+:: Thêm tất cả các file (index.html, manifest.json, v.v.)
 git add .
-git commit -m "Update 3D Ultrasound %date% %time%"
+git commit -m "Cập nhật ứng dụng ECG %date% %time%"
 
-echo Đang đẩy lên nhánh chính...
-git push origin main --force
+:: Đảm bảo đẩy vào nhánh main
+git branch -M main
+
+echo Đang đẩy dữ liệu lên GitHub Pages...
+:: Lệnh push này sẽ ghi đè bản cũ bằng bản mới nhất từ VS Code
+git push -u origin main --force
 
 echo ------------------------------------------
-echo XONG! Web của anh sẽ chạy tại:
-echo https://USERNAME.github.io/REPO_NAME/
+echo XONG! Trang web của anh đã được cập nhật tại:
+echo https://sonvu1969.github.io/ecg/
 echo ------------------------------------------
 pause
