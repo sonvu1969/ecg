@@ -1,0 +1,42 @@
+HƯỚNG DẪN CÀI ĐẶT ỨNG DỤNG (PWA)
+Để sử dụng ứng dụng mượt mà như một phần mềm chuyên nghiệp, không bị vướng thanh địa chỉ trình duyệt và có thể mở nhanh từ màn hình chính, anh hãy làm theo các bước sau:
+
+1. Trên iPhone / iPad (Trình duyệt Safari)
+Mở link ứng dụng bằng trình duyệt Safari.
+
+Nhấn vào biểu tượng Chia sẻ (hình ô vuông có mũi tên trỏ lên) ở thanh công cụ phía dưới màn hình.
+
+Cuộn xuống và chọn dòng Thêm vào màn hình chính (Add to Home Screen).
+
+Nhấn Thêm (Add) ở góc trên bên phải.
+
+Biểu tượng hình trái tim 🌸 sẽ xuất hiện trên màn hình điện thoại. Anh chỉ cần nhấn vào đó để mở ứng dụng.
+
+2. Trên Android (Trình duyệt Chrome)
+Mở link ứng dụng bằng trình duyệt Chrome.
+
+Nhấn vào biểu tượng 3 dấu chấm dọc ở góc trên bên phải màn hình.
+
+Chọn dòng Cài đặt ứng dụng (Install App) hoặc Thêm vào màn hình chính.
+
+Nhấn Cài đặt để xác nhận.
+
+Ứng dụng sẽ xuất hiện trong danh sách phần mềm và trên màn hình chính của anh.
+
+3. Trên Máy tính (PC / Laptop - Chrome hoặc Edge)
+Truy cập link ứng dụng.
+
+Nhìn lên thanh địa chỉ (ô nhập link), ở góc bên phải sẽ xuất hiện một biểu tượng hình màn hình có mũi tên tải xuống (Install).
+
+Nhấn vào đó và chọn Cài đặt.
+
+Ứng dụng sẽ mở ra trong một cửa sổ riêng biệt, không có thanh công cụ trình duyệt, giúp tăng diện tích hiển thị hình ảnh 3D.
+
+💡 Lợi ích khi cài đặt PWA:
+Toàn màn hình: Hình ảnh siêu âm sẽ hiển thị tối đa diện tích, không bị che bởi các nút của trình duyệt.
+
+Mượt mà hơn: Các thao tác xoay chuột hoặc vuốt cảm ứng sẽ nhạy hơn.
+
+Truy cập nhanh: Không cần nhập lại địa chỉ web, chỉ cần nhấn vào logo 🌸 trên màn hình.
+
+Tính riêng tư: Ứng dụng chạy độc lập, tạo cảm giác chuyên nghiệp khi cho bệnh nhân xem hình.

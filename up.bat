@@ -4,7 +4,7 @@ echo Đang dọn dẹp và cấu hình lại Git...
 :: Xóa cấu hình remote cũ bị sai (USERNAME/REPO_NAME)
 git remote remove origin
 
-:: Thêm lại địa chỉ chuẩn của anh
+:: Thêm lại địa chỉ chuẩn của anh ./up.bat
 git remote add origin https://github.com/sonvu1969/ecg.git
 
 echo Đang chuẩn bị dữ liệu...
